@@ -1,0 +1,90 @@
+95-development-workflow.mdc
+
+
+---
+description: IOMP developer and AI collaboration workflow
+alwaysApply: true
+---
+
+# Development Workflow
+
+The AI is an implementation and engineering assistant.
+
+The human developer remains responsible for:
+
+- architectural approval
+- business interpretation
+- Git history
+- commits
+- branches
+- merges
+- releases
+- production deployment
+- final code review
+
+## Git
+
+AI must not:
+
+- commit
+- amend
+- push
+- force push
+- branch
+- merge
+- rebase
+- reset
+- cherry-pick
+
+The developer performs all Git operations manually.
+
+## Before coding
+
+For significant work:
+
+1. Inspect relevant requirements.
+2. Inspect existing architecture.
+3. Identify affected bounded contexts.
+4. Identify dependencies.
+5. Identify security implications.
+6. Identify data implications.
+7. Identify tests.
+8. Produce an implementation plan.
+
+## During coding
+
+Prefer small, focused changes.
+
+Do not modify unrelated files.
+
+Do not perform opportunistic refactoring.
+
+If a necessary change crosses an architectural boundary,
+explain the boundary and proposed approach.
+
+## After coding
+
+Run appropriate:
+
+- tests
+- static analysis
+- formatting
+- linting
+- API checks
+- security checks
+
+Then inspect the resulting diff.
+
+Do not create the Git commit.
+
+## When uncertain
+
+Do not invent business behavior.
+
+Ask for clarification or document the assumption.
+
+## Destructive commands
+
+Ask for human confirmation before executing destructive commands.
+
+Never execute destructive production commands autonomously.

@@ -1,0 +1,143 @@
+---
+description: Core project instructions and engineering principles
+alwaysApply: true
+---
+
+# Project Engineering Rules
+
+This is a production-grade Laravel 12 application.
+
+The system must prioritize:
+
+1. Security
+2. Correctness
+3. Maintainability
+4. Testability
+5. Scalability
+6. Performance
+7. Observability
+8. Clear domain boundaries
+
+Never optimize for implementation speed at the expense of architectural integrity.
+
+## Requirements
+
+The project requirements document is the primary business source of truth.
+
+Before implementing a significant feature:
+
+1. Read the relevant requirements.
+2. Identify the affected bounded context.
+3. Identify domain rules and invariants.
+4. Identify dependencies.
+5. Identify security implications.
+6. Identify required tests.
+7. Determine whether an architectural decision record is required.
+
+Do not invent business requirements.
+
+If a requirement is ambiguous, ask for clarification or explicitly document the assumption.
+
+## Architecture
+
+Use Domain-Driven Design principles.
+
+Keep domain logic independent from Laravel infrastructure where reasonably practical.
+
+Do not introduce unnecessary abstractions.
+
+Do not create generic repositories, services, factories, managers, or helpers without a concrete architectural reason.
+
+Prefer explicit domain concepts over generic utility abstractions.
+
+Respect bounded-context boundaries.
+
+Do not directly access another bounded context's internal implementation.
+
+Changes crossing domain boundaries must use an explicit application-level contract.
+
+## Security
+
+Treat all external input as untrusted.
+
+Never trust:
+
+- request data
+- route parameters
+- headers
+- cookies
+- uploaded files
+- external APIs
+- client-side validation
+
+Authorization must be enforced server-side.
+
+Never expose secrets, credentials, tokens, or sensitive configuration in source code.
+
+Do not disable security controls merely to make tests or development easier.
+
+## Testing
+
+Every non-trivial feature must include appropriate automated tests.
+
+Tests should verify:
+
+- domain behavior
+- application behavior
+- authorization
+- validation
+- important integration boundaries
+- critical failure paths
+
+Do not modify tests merely to make an implementation pass unless the test itself is demonstrably incorrect.
+
+## Database
+
+Database integrity is part of application correctness.
+
+Use:
+
+- appropriate constraints
+- indexes
+- foreign keys where appropriate
+- transactions for atomic business operations
+- carefully designed migrations with id as PK and uuid for route params
+
+Do not add indexes blindly.
+
+Consider query patterns and expected data volume, minimize memory exhaution for high performance.
+
+## Performance
+
+Avoid premature optimization.
+
+However, performance-sensitive code must consider:
+
+- N+1 queries
+- unnecessary database queries
+- unbounded queries
+- memory consumption
+- queue workload
+- caching
+- expensive serialization
+- repeated external API calls
+
+Do not introduce caching without defining invalidation behavior.
+
+## Implementation
+
+Before making broad changes, inspect the existing implementation.
+
+Do not rewrite working subsystems unnecessarily.
+
+Prefer small, reviewable changes.
+
+After implementation:
+
+1. Run relevant tests.
+2. Run static analysis.
+3. Run formatting tools.
+4. Review the diff.
+5. Check for security implications.
+6. Check architectural boundary violations.
+7. Add Feature documentation md to /documentations/

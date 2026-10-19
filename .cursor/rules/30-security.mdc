@@ -1,0 +1,212 @@
+---
+description: IOMP security engineering rules
+alwaysApply: true
+---
+
+# Security
+
+Security is a primary architectural concern.
+
+Use defense in depth.
+
+## Trust boundaries
+
+Treat all external input as untrusted.
+
+This includes:
+
+- HTTP requests
+- API requests
+- route parameters
+- query parameters
+- headers
+- cookies
+- uploaded files
+- imported GeoJSON
+- external API responses
+- client-side data
+- background job payloads
+
+## Authentication
+
+Authentication must be server-side and explicit.
+
+API authentication uses the approved JWT architecture.
+
+Do not implement custom cryptography or token algorithms.
+
+Use established, maintained libraries.
+
+## Authorization
+
+Authentication is not authorization.
+
+Every protected operation must verify authorization.
+
+Never rely solely on:
+
+- hidden UI elements
+- frontend permissions
+- route obscurity
+- client-side checks
+
+Enforce authorization server-side.
+
+## RBAC
+
+Roles and permissions must be explicit. Using Spatie packages with admin configurable on UI.
+
+Where district-level access applies, authorization must enforce the user's
+assigned scope server-side.
+
+Never assume that a user who can access one district can access another.
+
+## Input validation
+
+Validate input at trust boundaries.
+
+Use allowlists where practical.
+
+Do not rely on database errors as validation.
+
+## Mass assignment
+
+Use explicit, safe assignment of request data.
+
+Never blindly map arbitrary request fields into persistent models.
+
+## File uploads
+
+Treat uploaded files as untrusted.
+
+Validate:
+
+- file type
+- file size
+- filename handling
+- storage location
+- access permissions
+- content where appropriate
+
+Never execute uploaded content.
+
+## GeoJSON
+
+Imported GeoJSON is untrusted input.
+
+Validate:
+
+- structure
+- geometry type
+- coordinate validity
+- coordinate reference expectations
+- size limits
+- polygon validity where required
+
+Do not trust client-provided geometry.
+
+## Secrets
+
+Never hardcode:
+
+- passwords
+- API keys
+- JWT secrets
+- private keys
+- database credentials
+- cloud credentials
+
+Use environment-based or managed secret configuration.
+
+Never output secrets in logs.
+
+## Logging
+
+Do not log:
+
+- passwords
+- authentication tokens
+- otp codes
+- session secrets
+- private keys
+- unnecessary sensitive personal data
+
+## API security
+
+Protect against:
+
+- broken access control
+- excessive data exposure
+- injection
+- replay where relevant
+- brute force
+- abuse
+- insecure object references
+- mass assignment
+- improper error disclosure
+- cors
+- CSP
+- bots
+
+## Web security
+
+Use appropriate:
+
+- CSRF protection
+- CSP
+- secure headers
+- cookie attributes
+- HTTPS
+- output escaping
+- content-type handling
+
+## SSRF
+
+External URL fetching must be treated as a security-sensitive operation.
+
+Never allow arbitrary internal-network access through user-controlled URLs.
+
+## Error handling
+
+Production errors must not expose:
+
+- stack traces
+- database credentials
+- SQL
+- filesystem paths
+- internal service details
+- secrets
+
+## Security review
+
+Significant security-sensitive changes require explicit security review.
+
+Do not declare the system secure merely because tests pass.
+
+## Investor verification
+
+Investor email and phone verification are security trust boundaries.
+
+Verification must be:
+
+- server-side
+- time-bound where tokens/OTP are used
+- rate-limited where appropriate
+- auditable
+- resistant to replay
+- protected against account enumeration where applicable
+
+Do not expose verification tokens or OTP values in logs.
+
+## Investor opportunity authorization
+
+Approved/active opportunity access is an authorization boundary.
+
+Do not assume that:
+
+- registration grants opportunity access;
+- authentication grants opportunity access;
+- knowing an opportunity UUID grants opportunity access;
+- hiding an opportunity in the UI protects it.
+
+Protected opportunity endpoints must enforce authorization server-side.

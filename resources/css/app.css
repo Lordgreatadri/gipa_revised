@@ -1,0 +1,680 @@
+@import 'tailwindcss';
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../app/Modules/**/Presentation/Views/**/*.blade.php';
+
+/*
+ * Light mode is the default; dark mode is opt-in through the `.dark` class
+ * on <html>, toggled by the theme control and persisted in localStorage.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    /* System font stack: no third-party font CDN, so the CSP stays 'self'. */
+    --font-sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    /* GIPA green: primary brand colour, derived from the national flag. */
+    --color-brand-50: oklch(0.975 0.02 155);
+    --color-brand-100: oklch(0.94 0.05 155);
+    --color-brand-200: oklch(0.88 0.09 155);
+    --color-brand-300: oklch(0.79 0.13 155);
+    --color-brand-400: oklch(0.68 0.16 155);
+    --color-brand-500: oklch(0.58 0.16 155);
+    --color-brand-600: oklch(0.50 0.15 155);
+    --color-brand-700: oklch(0.43 0.13 155);
+    --color-brand-800: oklch(0.36 0.10 155);
+    --color-brand-900: oklch(0.29 0.08 155);
+    --color-brand-950: oklch(0.21 0.06 155);
+
+    /* Gold accent, used sparingly for emphasis and primary calls to action. */
+    --color-gold-100: oklch(0.96 0.06 90);
+    --color-gold-300: oklch(0.90 0.14 90);
+    --color-gold-400: oklch(0.86 0.17 88);
+    --color-gold-500: oklch(0.80 0.17 85);
+    --color-gold-600: oklch(0.70 0.15 80);
+    --color-gold-700: oklch(0.58 0.13 75);
+
+    /* Flag red, for the tricolour rule only. */
+    --color-flag-red: oklch(0.58 0.22 27);
+
+    --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12);
+}
+
+@layer base {
+    html {
+        @apply antialiased scroll-smooth;
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
+    }
+
+    body {
+        @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+@layer components {
+    /* Ghana tricolour rule used under headers and as a brand accent. */
+    .tricolour {
+        background: linear-gradient(
+            to right,
+            var(--color-flag-red) 0 33.33%,
+            var(--color-gold-500) 33.33% 66.66%,
+            var(--color-brand-600) 66.66% 100%
+        );
+    }
+
+    /* Form controls share one look so every auth page feels consistent. */
+    .form-control {
+        @apply block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-brand-400;
+    }
+
+    .form-control[aria-invalid='true'] {
+        @apply border-red-500 focus:border-red-500 focus:ring-red-500/15;
+    }
+
+    .form-check {
+        @apply size-4 shrink-0 rounded border-slate-300 text-brand-600 focus:ring-brand-500 dark:border-slate-600 dark:bg-slate-900;
+    }
+
+    .link {
+        @apply font-medium text-brand-700 underline-offset-4 hover:underline dark:text-brand-300;
+    }
+
+    /* TailAdmin / Frest-style rows: enough vertical room to scan a register. */
+    .data-table th {
+        @apply px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500;
+    }
+
+    .data-table td {
+        @apply px-5 py-4 align-middle text-sm text-slate-700 dark:text-slate-200;
+    }
+
+    .data-table tbody tr {
+        @apply border-t border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-white/5;
+    }
+
+    .cta {
+        @apply inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-center text-sm font-bold sm:w-auto sm:px-6 sm:py-3.5;
+    }
+
+    .backup-action {
+        @apply inline-flex min-w-40 cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-center text-sm font-bold no-underline;
+    }
+
+    .backup-action-download {
+        @apply bg-brand-700 text-white hover:bg-brand-800;
+    }
+
+    .backup-action-check {
+        @apply border border-gold-600 bg-gold-100 text-slate-900 hover:bg-gold-300 dark:text-slate-950;
+    }
+
+    .backup-action-delete {
+        @apply border border-red-700 bg-white text-red-800 hover:bg-red-50 dark:bg-slate-900 dark:text-red-200 dark:hover:bg-red-950;
+    }
+
+    .backup-action-delete-confirm {
+        @apply bg-red-700 text-white hover:bg-red-800;
+    }
+
+    .backup-confirm > summary {
+        list-style: none;
+    }
+
+    .backup-confirm > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .quarter-switch button {
+        @apply border-l border-slate-200 bg-white px-3 py-3 text-xs font-bold tracking-wide text-slate-700 first:border-l-0 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-800;
+    }
+
+    .quarter-switch button[aria-pressed="true"] {
+        @apply bg-brand-800 text-white hover:bg-brand-800 dark:bg-brand-700 dark:text-white;
+    }
+
+    /* Subtle dot grid used on brand panels. */
+    .brand-grid {
+        background-image: radial-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px);
+        background-size: 22px 22px;
+    }
+
+    .font-display {
+        font-family: var(--font-display);
+        letter-spacing: -0.03em;
+    }
+
+    .ghana-flag-rule {
+        display: inline-flex;
+        width: 1.5rem;
+        height: 0.3rem;
+        overflow: hidden;
+        border-radius: 1px;
+    }
+
+    .ghana-flag-rule > i {
+        flex: 1;
+    }
+
+    .ghana-flag-rule > i:nth-child(1) {
+        background: var(--color-flag-red);
+    }
+
+    .ghana-flag-rule > i:nth-child(2) {
+        background: var(--color-gold-500);
+    }
+
+    .ghana-flag-rule > i:nth-child(3) {
+        background: var(--color-brand-500);
+    }
+
+    summary.list-none::-webkit-details-marker,
+    .workspace-sidebar summary::-webkit-details-marker {
+        display: none;
+    }
+
+    /*
+     * The sidebar is a grid column on desktop and a drawer below that.
+     * Display is set here, not with the hidden attribute: Tailwind's
+     * preflight hides [hidden] with !important, which dropped the column
+     * and squeezed the workspace into the navigation slot.
+     */
+    .workspace-sidebar {
+        display: none;
+        flex-direction: column;
+    }
+
+    .workspace-sidebar.is-open {
+        display: flex;
+    }
+
+    @media (min-width: 1024px) {
+        .workspace-sidebar {
+            display: flex;
+        }
+    }
+
+    /* Honeypot: present in the DOM for bots, off-screen for people. */
+    .honeypot {
+        position: absolute;
+        left: -10000px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
+
+    .amount-stepper::-webkit-inner-spin-button,
+    .amount-stepper::-webkit-outer-spin-button {
+        opacity: 1;
+        height: 1.75rem;
+        cursor: pointer;
+    }
+
+    .opportunity-popup .maplibregl-popup-content {
+        background: #ffffff;
+        color: #0f172a;
+        border-radius: 0.85rem;
+        padding: 0.85rem 1rem;
+        box-shadow: 0 16px 40px rgb(15 23 42 / 0.22);
+        backdrop-filter: none;
+    }
+
+    .opportunity-popup .maplibregl-popup-content strong,
+    .opportunity-popup .maplibregl-popup-content p {
+        color: #0f172a;
+    }
+
+    .opportunity-popup .maplibregl-popup-content p {
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .opportunity-popup .maplibregl-popup-content a {
+        display: inline-block;
+        margin-top: 0.6rem;
+        color: #0f6e56;
+        font-weight: 700;
+        pointer-events: auto;
+    }
+
+    .opportunity-popup .maplibregl-popup-close-button {
+        color: #0f172a;
+        font-size: 1.25rem;
+    }
+}
+
+/*
+ * API reference tabs. Radios stay in the accessibility tree and the panels
+ * switch with :has(), so the page needs no inline script.
+ */
+.api-switch .api-panel {
+    display: none;
+}
+
+.api-switch:has(input[data-panel='curl']:checked) .api-panel[data-panel='curl'],
+.api-switch:has(input[data-panel='php']:checked) .api-panel[data-panel='php'],
+.api-switch:has(input[data-panel='node']:checked) .api-panel[data-panel='node'] {
+    display: block;
+}
+
+.api-switch:has(input[data-status='200']:checked) .api-panel[data-status='200'],
+.api-switch:has(input[data-status='201']:checked) .api-panel[data-status='201'],
+.api-switch:has(input[data-status='401']:checked) .api-panel[data-status='401'],
+.api-switch:has(input[data-status='403']:checked) .api-panel[data-status='403'],
+.api-switch:has(input[data-status='404']:checked) .api-panel[data-status='404'],
+.api-switch:has(input[data-status='422']:checked) .api-panel[data-status='422'],
+.api-switch:has(input[data-status='429']:checked) .api-panel[data-status='429'],
+.api-switch:has(input[data-status='503']:checked) .api-panel[data-status='503'] {
+    display: block;
+}
+
+.api-tab-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.api-tab-input:checked + .api-tab {
+    background: #0f6e56;
+    color: #ffffff;
+}
+
+.api-tab-input:focus-visible + .api-tab {
+    outline: 2px solid #d4a017;
+    outline-offset: 2px;
+}
+
+.assistant-widget {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.assistant-dock {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.assistant-peek {
+    margin: 0;
+    border-radius: 999px;
+    background: #fff;
+    color: #0f6e56;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    box-shadow: 0 10px 24px rgb(15 23 42 / 0.16);
+    animation: assistant-peek 2.8s ease-in-out infinite;
+}
+
+.dark .assistant-peek {
+    background: #12352c;
+    color: #d7f5ea;
+}
+
+.assistant-widget.is-open .assistant-peek {
+    display: none;
+}
+
+.assistant-launcher,
+.assistant-send,
+.assistant-panel-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    cursor: pointer;
+}
+
+.assistant-launcher {
+    position: relative;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 999px;
+    background: #0f6e56;
+    color: #fff;
+    box-shadow: 0 12px 30px rgb(15 110 86 / 0.35);
+}
+
+.assistant-launcher::before,
+.assistant-launcher::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+}
+
+.assistant-launcher::before {
+    inset: -8px;
+    z-index: -2;
+    background: radial-gradient(circle, #e7b51d 0%, #21c08a 46%, transparent 72%);
+    animation: assistant-breathe 2.4s ease-in-out infinite;
+}
+
+.assistant-launcher::after {
+    inset: -4px;
+    z-index: -1;
+    background: conic-gradient(from 0deg, #e7b51d, #21c08a, #0f6e56, #ef5b45, #e7b51d);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+    animation: assistant-spin 4.5s linear infinite;
+}
+
+.assistant-widget.is-open .assistant-launcher::before,
+.assistant-widget.is-open .assistant-launcher::after {
+    animation: none;
+    opacity: 0;
+}
+
+.assistant-launcher:hover {
+    transform: translateY(-2px);
+}
+
+.assistant-launcher svg,
+.assistant-send svg,
+.assistant-panel-close svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.assistant-launcher-close,
+.assistant-widget.is-open .assistant-launcher-open {
+    display: none;
+}
+
+.assistant-widget.is-open .assistant-launcher-close {
+    display: block;
+}
+
+.assistant-panel {
+    display: flex;
+    width: min(24rem, calc(100vw - 2rem));
+    height: min(36rem, calc(100vh - 8rem));
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    border: 1px solid rgb(226 232 240);
+    background: #fff;
+    box-shadow: 0 20px 50px rgb(15 23 42 / 0.18);
+    transform-origin: bottom right;
+    animation: assistant-rise 0.28s ease;
+}
+
+.dark .assistant-panel {
+    border-color: rgb(51 65 85);
+    background: rgb(15 23 42);
+}
+
+.assistant-panel[hidden] {
+    display: none;
+}
+
+.assistant-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    background: #0f6e56;
+    color: #fff;
+}
+
+.assistant-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.assistant-avatar {
+    display: grid;
+    width: 2.4rem;
+    height: 2.4rem;
+    flex: none;
+    place-items: center;
+    border-radius: 0.8rem;
+    background: rgb(255 255 255 / 0.14);
+    color: #e7b51d;
+}
+
+.assistant-avatar svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.assistant-panel-close,
+.assistant-send {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.16);
+    color: #fff;
+}
+
+.assistant-thread {
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: #f8fafc;
+}
+
+.dark .assistant-thread {
+    background: #020617;
+}
+
+.assistant-message {
+    margin-bottom: 0.75rem;
+    max-width: 95%;
+    border-radius: 1rem;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.assistant-message-bot {
+    background: #e7f4ee;
+    color: #12352c;
+}
+
+.dark .assistant-message-bot {
+    background: #16382f;
+    color: #ecfdf5;
+}
+
+.assistant-message-user {
+    margin-left: auto;
+    background: #0f6e56;
+    color: #fff;
+}
+
+.assistant-sources {
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    font-size: 0.75rem;
+}
+
+.assistant-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0 1rem 0.75rem;
+}
+
+.assistant-suggestions button {
+    border: 1px solid rgb(167 214 196);
+    border-radius: 999px;
+    background: transparent;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    color: #0f6e56;
+    cursor: pointer;
+}
+
+.dark .assistant-suggestions button {
+    border-color: #1f6f5b;
+    color: #b7e4d4;
+}
+
+.assistant-form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 1rem 0.5rem;
+}
+
+.assistant-form input {
+    width: 100%;
+    border: 1px solid rgb(203 213 225);
+    border-radius: 999px;
+    padding: 0.7rem 0.9rem;
+    background: #fff;
+    color: #0f172a;
+}
+
+.dark .assistant-form input {
+    border-color: rgb(51 65 85);
+    background: rgb(2 6 23);
+    color: #f8fafc;
+}
+
+.assistant-send {
+    flex: none;
+    background: #0f6e56;
+}
+
+.assistant-disclaimer {
+    margin: 0;
+    padding: 0 1rem 0.9rem;
+    background: #fff;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: rgb(100 116 139);
+}
+
+.dark .assistant-disclaimer {
+    background: rgb(15 23 42);
+}
+
+.assistant-typing {
+    display: inline-flex;
+    gap: 0.28rem;
+    align-self: flex-start;
+    margin-bottom: 0.75rem;
+    border-radius: 999px;
+    background: #e7f4ee;
+    padding: 0.7rem 0.85rem;
+}
+
+.assistant-typing span {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: #0f6e56;
+    animation: assistant-dot 1s infinite ease-in-out;
+}
+
+.assistant-typing span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.assistant-typing span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes assistant-breathe {
+    0%, 100% { transform: scale(0.92); opacity: 0.45; }
+    50% { transform: scale(1.12); opacity: 0.95; }
+}
+
+@keyframes assistant-spin {
+    to { transform: rotate(1turn); }
+}
+
+@keyframes assistant-peek {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes assistant-rise {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes assistant-dot {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+    40% { transform: translateY(-4px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .assistant-peek,
+    .assistant-launcher::before,
+    .assistant-launcher::after,
+    .assistant-panel,
+    .assistant-typing span {
+        animation: none;
+    }
+}
+
+/* Pale tiled wash for an opportunity card. The green stays light. */
+.opportunity-tile {
+    background-color: #e7f4ee;
+    background-image:
+        linear-gradient(165deg, rgb(255 255 255 / 0.42), rgb(143 196 176 / 0.38)),
+        repeating-linear-gradient(90deg, rgb(255 255 255 / 0.45) 0 16px, transparent 16px 32px),
+        repeating-linear-gradient(0deg, rgb(15 110 86 / 0.07) 0 16px, transparent 16px 32px);
+}
+
+.dark .opportunity-tile {
+    background-color: #1a3d34;
+    background-image:
+        linear-gradient(165deg, rgb(255 255 255 / 0.06), rgb(15 110 86 / 0.28)),
+        repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 16px, transparent 16px 32px),
+        repeating-linear-gradient(0deg, rgb(255 255 255 / 0.04) 0 16px, transparent 16px 32px);
+}

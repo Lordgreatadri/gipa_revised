@@ -1,0 +1,123 @@
+40-data.mdc
+
+---
+description: IOMP database, data integrity, PostgreSQL and PostGIS rules
+alwaysApply: true
+---
+
+# Data Architecture
+
+The primary relational database is PostgreSQL.
+
+PostGIS is used for geospatial capabilities.
+
+## Data ownership
+
+Each bounded context should have clear ownership of its data.
+
+Do not duplicate authoritative data unnecessarily.
+
+## Database integrity
+
+Prefer database constraints for fundamental integrity rules where appropriate.
+
+Consider:
+
+- foreign keys
+- id as PK
+- uuid for route model binding
+- unique constraints
+- proper relationship mapping
+- check constraints
+- indexes
+- nullability
+- referential integrity
+
+Application validation does not replace database integrity.
+
+## Migrations
+
+Migrations must be:
+
+- deterministic
+- reviewable
+- safe
+- reversible where practical
+
+Do not destroy or transform production data casually.
+
+Large data migrations should be designed separately from schema migrations
+when necessary.
+
+## Indexes
+
+Create indexes based on actual access patterns.
+
+introduce a certificate status/history model rather than simply having valid = true/false.
+
+Something like:
+
+certificate
+    │
+    └── certificate_events
+           │
+           ├── ISSUED
+           ├── VERIFIED
+           ├── UPDATED
+           ├── SUSPENDED
+           └── REVOKED
+
+           
+Consider:
+
+- filtering
+- sorting
+- joins
+- foreign keys
+- geographic queries
+- API query patterns
+
+Do not add indexes indiscriminately.
+
+## Geospatial
+
+Use PostGIS-native capabilities for geospatial operations.
+
+Avoid pulling large geographic datasets into PHP merely to perform operations
+that PostgreSQL/PostGIS can execute efficiently.
+
+Consider:
+
+- spatial reference systems
+- GiST indexes
+- bounding box queries
+- proximity queries
+- polygon containment/intersection
+- GeoJSON serialization
+
+## Geography
+
+Do not hardcode the number of districts into application logic.
+
+The initial dataset may contain Ghana's 261 districts mapped to corresponding regions, but the model must support
+future administrative changes.
+
+## Money
+
+Monetary values must use precise numeric storage.
+
+Never use floating-point arithmetic for authoritative monetary calculations.
+
+Currency must be explicit.
+
+## Audit data
+
+Material state changes must preserve sufficient historical information with proper trail & lifecycle for audit.
+
+Audit records should be append-oriented and protected from ordinary modification.
+
+## PII
+
+Collect and retain only information required for the documented purpose.
+
+Avoid exposing personal information through public endpoints.

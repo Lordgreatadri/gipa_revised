@@ -1,0 +1,80 @@
+85-performance.mdc
+
+---
+description: IOMP performance and scalability engineering rules
+alwaysApply: true
+---
+
+# Performance
+
+The target includes:
+
+95% of API requests responding within 2 seconds under the agreed load.
+
+This is a measurable requirement, not a reason for premature optimization.
+
+## Database
+
+Watch for:
+
+- N+1 queries
+- unbounded queries
+- missing indexes
+- unnecessary joins
+- excessive serialization
+- large result sets
+
+Use eager loading intentionally.
+
+Do not eager load everything by default.
+
+## Pagination
+
+Large collections must be paginated or otherwise bounded.
+
+## Caching
+
+Use caching where it provides measurable benefit.
+
+Every cache must have a defined invalidation strategy.
+
+Do not cache mutable business data without understanding consistency requirements.
+
+## Queues
+
+Use queues for work that should not block the request lifecycle, such as:
+
+- email delivery
+- sms delivery
+- expensive imports
+- large document processing
+- certain reports
+- asynchronous notifications
+
+Queue usage must preserve correctness and idempotency.
+
+## Horizontal scaling
+
+Avoid designs that require local process memory to maintain shared business state.
+
+Important state should be stored in shared infrastructure.
+
+Decouling of key component should be valued 
+
+## Geospatial
+
+Optimize spatial queries using appropriate PostGIS indexes and query shapes.
+
+Do not load large geographic datasets into application memory unnecessarily.
+
+## API
+
+Avoid returning unnecessary fields.
+
+Avoid unbounded API responses.
+
+## Measurement
+
+Do not claim performance compliance without testing under an agreed workload.
+
+Performance optimization should be supported by measurements.

@@ -1,0 +1,570 @@
+This technical documentation is designed to be handed directly to a development team to build TheLeads Laundry Management System (TLMS) as a multi-tenant SaaS / Platform-as-a-Service (PaaS) product. It assumes that TheLeads Laundry & Dry Cleaning will be one of many laundry businesses using the platform, even though you own the platform itself.
+
+### TheLeads Laundry Management System (TLMS) — Technical Documentation
+
+### 1. Project overview
+
+Project name: TheLeads Laundry Management System (TLMS)
+
+Product type: Multi-tenant SaaS / Platform-as-a-Service for laundry and dry-cleaning businesses.
+
+Primary goal: Enable independent laundry businesses to register, subscribe, and manage their daily operations — including customers, orders, pickups, deliveries, payments, staff, notifications, and loyalty programs — from a centralized cloud platform.
+
+### Core business model
+
+* Platform Owner (Super Admin): Manages the SaaS platform, subscriptions, pricing plans, support, and global settings.
+
+* Laundry Tenant: Each laundry business signs up as an independent tenant with isolated data.
+
+* Tenant Staff: Employees of a laundry business manage operations based on assigned roles and permissions.
+
+* End Customers: Customers of each laundry business receive services, notifications, and loyalty rewards.
+
+### 2. System architecture
+
+Architecture style: Multi-tenant modular monolith (initial phase), designed for future microservice extraction.
+
+### High-level architecture
+
+### Web / Mobile UI
+
+Blade + Tailwind CSS
+
+### Laravel Application
+
+Business Logic Layer
+
+### MySQL Database
+
+Tenant Data Isolation
+
+### Redis Queue
+
+SMS & Jobs
+
+### SMS Gateway
+
+Notifications
+
+### Payment Gateway
+
+Subscriptions
+
+### Future Mobile App
+
+API Access
+
+### Multi-tenancy strategy
+
+Use single database, shared schema with a `tenant_id` column on all tenant-owned tables.
+
+* Pros: Lower infrastructure cost, easier maintenance, simpler backups.
+
+* Cons: Requires strict query scoping to prevent data leakage.
+
+* Recommendation: Use stancl/tenancy or a custom Laravel global scope for tenant isolation.
+
+### 3. Recommended technology stack
+
+| Layer               | Technology                                         |
+| ------------------- | -------------------------------------------------- |
+| Backend Framework   | Laravel 11                                         |
+| Frontend            | Blade + Tailwind CSS                               |
+| JavaScript          | Vanilla JS + Alpine.js (lightweight interactivity) |
+| Database            | MySQL 8                                            |
+| Cache / Queue       | Redis                                              |
+| Authentication      | Laravel Breeze                                     |
+| Roles & Permissions | Spatie Laravel Permission                          |
+| Multi-tenancy       | stancl/tenancy                                     |
+| SMS Gateway         | FROG, Hubtel, Arkesel, or Africa’s Talking   |
+| Payment Gateway     | To be provided later                               |
+| File Storage        | AWS S3 or local storage (initial phase)            |
+| Deployment          | Docker + Nginx + PHP-FPM                           |
+| CI/CD               | GitHub Actions                                     |
+
+### Why this stack?
+
+* Laravel provides rapid development, security, and a mature ecosystem.
+
+* Blade + Tailwind CSS creates a fast, mobile-friendly interface without heavy frontend frameworks.
+
+* Spatie Laravel Permission simplifies role-based access control.
+
+* Redis ensures SMS and notification jobs do not slow down the main application.
+
+* MySQL 8 is reliable, scalable, and familiar to many developers.
+
+### 4. User roles and permissions
+
+| Role             | Responsibilities                                          |
+| ---------------- | --------------------------------------------------------- |
+| Super Admin      | Manage tenants, subscriptions, platform settings, support |
+| Tenant Owner     | Manage own laundry business, staff, pricing, reports      |
+| Manager          | Oversee operations, approve discounts, view reports       |
+| Cashier          | Create orders, receive payments, issue receipts           |
+| Pickup Rider     | Manage pickups and deliveries                             |
+| Production Staff | Update service status                                     |
+| Customer         | Track orders, receive notifications (future portal)       |
+
+### 5. Core modules and features
+
+### 5.1 Tenant management
+
+### Features
+
+* Laundry business registration
+
+* Subscription plan selection (free usage plan for first 30 days)
+
+* Custom branding (logo, business name, contact details)
+
+* Subdomain support (e.g., `theleads.tlms.com`)
+
+* Tenant activation / suspension
+
+### Key tables
+
+* `tenants`
+
+* `subscription_plans`
+
+* `subscriptions`
+
+### 5.2 Client and record management
+
+### Features
+
+* Register new customers
+
+* Store customer contact details
+
+* Track customer visit history
+
+* Store preferences (e.g., starch level, perfume preference)
+
+* Search customers by name, phone, or receipt number
+
+### Customer data model
+
+| Field       | Type      |
+| ----------- | --------- |
+| id          | UUID      |
+| tenant_id   | ID (but uses tenant _uuid in routes)      |
+| first_name  | VARCHAR   |
+| last_name   | VARCHAR   |
+| phone       | VARCHAR   |
+| email       | VARCHAR   |
+| address     | TEXT      |
+| preferences | JSON      |
+| created_at  | TIMESTAMP |
+
+### 5.3 Order management
+
+### Features
+
+* Create laundry orders
+
+* Select services (washing, ironing, dry cleaning, folding, pickup/delivery)
+
+* Add item quantities and prices
+
+* Generate unique receipt/order number
+
+* Track order status
+
+* Handle full/partial payments
+
+### Order status workflow
+
+Received
+
+Processing
+
+Washing
+
+Ironing
+
+Ready
+
+Delivered
+
+### Order tables
+
+* `orders`
+
+* `order_items`
+
+* `services`
+
+* `payments`
+
+### 5.4 Pickup and delivery management
+
+### Features
+
+* Schedule pickups
+
+* Assign riders
+
+* Track pickup/delivery status
+
+* Capture proof of delivery (unique code from customer to mark delivery)
+
+* Calculate delivery fees (consider if there is discount)
+
+### Workflow
+
+* Customer requests pickup.
+
+* System creates a pickup task.
+
+* Manager assigns a rider.
+
+* Rider confirms pickup.
+
+* Order enters processing workflow.
+
+* When ready, rider delivers order.
+
+* Customer confirms delivery.
+You should also consider the fact that, some tenants may not have delivery service at hand but only pickup
+
+### 5.5 SMS notification system
+
+### Trigger events
+
+| Event            | SMS Sent |
+| ---------------- | -------- |
+| Order received   | Yes      |
+| Order processing | Optional |
+| Order ready      | Yes      |
+| Order delivered  | Yes      |
+| Pickup scheduled | Yes      |
+| Bulk promotion   | Yes      |
+
+### SMS queue logic
+
+* Business action triggers an event.
+
+* Event dispatches a queued job.
+
+* Redis stores the job.
+
+* Laravel queue worker sends SMS via gateway.
+
+* Delivery status is logged in `sms_logs`.
+
+### Example SMS templates
+
+Dear John, your laundry order #TL12345 has been received and is being processed. Thank you for choosing TheLeads Laundry.
+
+Good news! Your laundry order #TL12345 is ready for pickup/delivery. Please contact us for arrangements.
+
+### 5.6 Loyalty and rewards system (This should be optional, configurable by each tenant)
+
+### Business requirement
+
+A customer who collects and presents 5 receipts receives the 6th service free (or a configurable discount).
+
+### Recommended implementation
+
+Use a points-based loyalty system rather than physical receipt counting with SMS to notify customer of winning acceptable point for a free service.
+
+### Logic flow
+
+* Each completed order earns 1 loyalty point.
+
+* When points reach 5 (configurable by tenant), customer becomes eligible for a reward.
+
+* System generates a reward voucher and SMS to the customer.
+
+* Voucher can be redeemed on the next order.
+
+* After redemption, points reset or continue accumulating based on tenant settings.
+
+### Loyalty tables
+
+* `loyalty_programs`
+
+* `loyalty_points`
+
+* `reward_vouchers`
+
+### Reward configuration
+
+| Setting          | Example       |
+| ---------------- | ------------- |
+| Points per order | 1             |
+| Points required  | 5, 10, 15 etc |
+| Reward type      | Free service  |
+| Reward value     | 100% discount |
+
+### 5.7 Bulk notification module
+
+### Features
+
+* Select customer groups
+
+* Compose SMS campaign
+
+* Schedule campaigns
+
+* Track delivery reports
+
+* Manage SMS credits per tenant
+
+### Customer segmentation
+
+* All customers
+
+* Customers with pending orders
+
+* Customers inactive for 30+ days
+
+* Loyal customers
+
+* Customers by location
+
+### 5.8 Reporting and analytics
+
+### Reports
+
+* Daily revenue
+
+* Monthly revenue
+
+* Outstanding payments
+
+* Most used services
+
+* Customer retention rate
+
+* Rider performance
+
+* SMS usage
+
+* Loyalty redemption rate
+
+### 6. Data flow and synchronization
+
+### 6.1 Order creation flow
+
+Customer arrives
+
+Cashier creates order
+
+System generates receipt
+
+Order saved to database
+
+SMS queued: Order received
+
+Production notified
+
+### 6.2 Status update flow
+
+Staff updates status
+
+Order status changed
+
+Event dispatched
+
+SMS notification queued
+
+Customer receives SMS
+
+### 6.3 Loyalty synchronization flow
+
+Order completed
+
+Add loyalty point
+
+Check threshold
+
+Generate reward voucher if eligible
+
+Notify customer
+
+### 7. Database schema (high-level)
+
+### Core tables
+
+| Table           | Purpose                   |
+| --------------- | ------------------------- |
+| tenants         | Laundry businesses        |
+| users           | Platform and tenant users |
+| customers       | End customers             |
+| services        | Laundry service catalog   |
+| orders          | Order records             |
+| order_items     | Items within an order     |
+| payments        | Payment transactions      |
+| pickups         | Pickup schedules          |
+| deliveries      | Delivery schedules        |
+| sms_logs        | SMS history               |
+| loyalty_points  | Customer points           |
+| reward_vouchers | Loyalty rewards           |
+| subscriptions   | SaaS billing              |
+| roles related tables
+| permissions related tables
+
+### 8. API endpoints (future mobile app)
+
+### Authentication
+
+| Method | Endpoint    |
+| ------ | ----------- |
+| POST   | /api/login  |
+| POST   | /api/logout |
+
+### Orders
+
+| Method | Endpoint                |
+| ------ | ----------------------- |
+| GET    | /api/orders             |
+| POST   | /api/orders             |
+| PUT    | /api/orders/{uuid}        |
+| PATCH  | /api/orders/{uuid}/status |
+
+### Customers
+
+| Method | Endpoint            |
+| ------ | ------------------- |
+| GET    | /api/customers      |
+| POST   | /api/customers      |
+| GET    | /api/customers/{uuid} |
+
+### 9. Security considerations
+
+* Tenant isolation: Every query must be scoped by `tenant_id`.
+
+* Authentication: Use Laravel Sanctum for API authentication.
+
+* Authorization: Use Spatie roles and permissions. With tables defined and seeded
+
+* Data encryption: Encrypt sensitive customer data where necessary.
+
+* Audit logs: Record all critical actions.
+
+* Backups: Daily automated database backups.
+
+* Rate limiting: Prevent abuse of SMS and API endpoints.
+
+### 10. SaaS subscription model
+With 30 days free trial
+
+| Plan         | Features                               |
+| ------------ | -------------------------------------- |
+| Starter      | Basic orders, customers, receipts      |
+| Professional | SMS, loyalty, pickups/deliveries       |
+| Enterprise   | Custom branding, API, advanced reports |
+
+### 11. UI/UX design system
+
+### Recommended color palette
+
+| Element    | Color   |
+| ---------- | ------- |
+| Primary    | #0F766E |
+| Secondary  | #14B8A6 |
+| Accent     | #F59E0B |
+| Background | #F8FAFC |
+| Card       | #FFFFFF |
+| Text       | #1E293B |
+| Success    | #16A34A |
+| Danger     | #DC2626 |
+
+### Design principles
+
+* Mobile-first responsive design.
+
+* Clean white background with teal primary accents.
+
+* Rounded cards and subtle shadows.
+
+* Large touch targets for mobile users.
+
+* Minimalistic dashboard with quick actions.
+
+### 12. Development roadmap
+
+### Phase 1: MVP (8–10 weeks)
+
+* Tenant registration
+
+* Customer management
+
+* Order management
+
+* Receipt generation
+
+* Basic reporting
+
+### Phase 2: Operations (6–8 weeks)
+
+* Pickup and delivery
+
+* SMS notifications
+
+* Payment tracking
+
+* Role management
+
+### Phase 3: Growth (6–8 weeks)
+
+* Loyalty program
+
+* Bulk SMS
+
+* Advanced analytics
+
+* Subscription billing
+
+### Phase 4: Scale (8–12 weeks)
+
+* Mobile app API
+
+* Customer portal
+
+* Multi-language support
+
+* AI-powered demand forecasting
+
+### 13. Recommended Laravel project structure
+
+```
+app/
+├── Models/
+├── Http/
+│   ├── Controllers/
+│   ├── Requests/
+│   └── Middleware/
+├── Services/
+├── Repositories/  Please do not use repository, change to another architecture
+├── Jobs/
+├── Events/
+├── Listeners/
+├── Notifications/
+└── Policies/
+```
+
+### 14. Key business logic rules
+
+* Receipt numbers: Must be unique per tenant (e.g., TL-2026-0001).
+
+* Order status: Cannot skip mandatory workflow steps unless overridden by a manager.
+
+* SMS credits: Tenants cannot send bulk SMS without sufficient credits.
+
+* Loyalty rewards: Points are awarded only after payment is completed.
+
+* Subscription expiry: Tenant access is restricted when subscription expires.
+
+* Data deletion: Use soft deletes for auditability.
+
+### 15. Final recommendation
+
+For TheLeads Laundry Management System, I strongly recommend building the first version as a Laravel 11 multi-tenant SaaS platform using Blade, Tailwind CSS, MySQL 8, Redis, and Spatie Laravel Permission. This approach is cost-effective, fast to develop, and scalable enough to support hundreds of laundry businesses before needing to migrate to a more complex microservice architecture.
+
+The teal-and-white color palette (#0F766E, #14B8A6, and #F59E0B) will give the platform a modern, trustworthy, and premium appearance while remaining bright and mobile-friendly.
+
+This document provides the functional requirements, architecture, database design, workflows, security rules, and development roadmap needed for a developer or development team to begin building the system immediately.

@@ -1,0 +1,283 @@
+70-frontend.mdc
+
+---
+description: IOMP Blade Alpine Tailwind frontend architecture and accessibility
+globs:
+  - "resources/views/**/*.blade.php"
+  - "resources/js/**/*.js"
+  - "resources/css/**/*.css"
+alwaysApply: false
+---
+
+# Frontend
+
+Frontent require light mode default and dark mode toggle for both
+
+The frontend uses:
+
+- Blade
+- Alpine.js
+- Vanilla JavaScript where appropriate
+- Tailwind CSS
+- Echarts
+- Chart.js
+- @tanstack/table-core
+- ayjs
+- axios
+- lucide
+- leaflet
+- maplibre-gl
+- qrcode
+- sweetalert2
+
+
+npm install \
+  alpinejs \
+  @alpinejs/focus \
+  @alpinejs/intersect \
+  echarts \
+  @tanstack/table-core \
+  dayjs \
+  axios \
+  lucide \
+  maplibre-gl \
+  qrcode \
+  sweetalert2 \
+  ... 
+
+Do not introduce React, Vue, Inertia, Livewire, or another frontend framework
+without an explicit architecture decision.
+
+## Blade
+
+Blade is presentation-oriented.
+
+Do not put business rules into Blade templates.
+
+Use escaped output by default.
+
+Explicitly justify any raw HTML output.
+
+## Alpine
+
+Use Alpine for localized UI state and interaction.
+
+Do not duplicate server-side authorization in Alpine.
+
+Client-side behavior improves UX but never replaces server-side security.
+
+## JavaScript
+
+Use Vanilla JavaScript where it is clearer or reusable.
+
+Avoid unnecessary client-side application complexity.
+
+Use the Datatable for easy sorting of record
+
+
+## Tailwind
+
+Use the project's established design system and Tailwind conventions.
+
+Avoid arbitrary one-off styling when an existing component or utility pattern
+exists.
+
+## Accessibility
+
+Target WCAG 2.1 Level AA where specified.
+
+Consider:
+
+- semantic HTML
+- keyboard navigation
+- focus management
+- labels
+- accessible error messages
+- color contrast
+- screen reader behavior
+- reduced motion
+- form accessibility
+- map accessibility alternatives
+
+## Forms
+
+Server-side validation is authoritative.
+
+Validation errors should be accessible and understandable.
+
+## Public vs Admin
+
+Public interfaces and admin interfaces have different security and usability
+requirements. views/public/* => controllers/public/*, views/admin/* => controllers/admin/*
+
+Do not accidentally expose administrative functionality through public UI.
+
+
+GIPA-[year]-[district]-8F4K7Q2M9X
+
+QR scanner
+    ↓
+/verify/GIPA-2026-KS-7F3K9M2Q
+    ↓
+Laravel
+    ↓
+Certificate lookup
+    ↓
+Validate certificate
+    ↓
+Show authenticity/status
+
+use a PHP QR package on the backend
+The frontend qrcode package is useful when you need to dynamically render a QR in the browser.
+
+for an official certificate that is being stored, printed, downloaded and archived, I'd generate the QR server-side.
+
+That gives you:
+Certificate creation
+        ↓
+Laravel
+        ↓
+Generate QR
+        ↓
+Store QR asset
+        ↓
+Attach to certificate PDF
+
+
+store:
+
+certificate_code
+verification_url
+qr_path
+
+as the authoritative data.
+
+ you should always be able to regenerate the QR from:
+
+certificate_code
+
+That means losing the image isn't catastrophic.
+
+
+Map viewport
+     ↓
+minLng/minLat/maxLng/maxLat
+     ↓
+Laravel API
+     ↓
+PostGIS
+     ↓
+ST_MakeEnvelope(...)
+     ↓
+GiST index
+     ↓
+only opportunities in viewport
+     ↓
+GeoJSON
+     ↓
+MapLibre
+
+
+frontend stack could therefore look like this:
+Blade
+│
+├── Tailwind CSS
+│
+├── Alpine.js
+│   ├── filters
+│   ├── modals
+│   ├── dropdowns
+│   ├── certificate interactions
+│   └── dashboard controls
+│
+├── ECharts
+│   ├── investment by region, districts
+│   ├── opportunities by sector
+│   ├── certificate statistics
+│   └── investment trends
+│
+├── MapLibre GL
+│   ├── Ghana map
+│   ├── district boundaries
+│   ├── opportunity markers
+│   ├── clustering
+│   └── filtering
+│
+├── QRCode
+│   └── browser QR rendering where needed
+│
+├── Axios
+│   └── API requests
+│
+├── Day.js
+│   └── dates
+│
+└── Lucide
+    └── icons
+
+
+And backend:
+Laravel
+│
+├── Eloquent
+│
+├── PostgreSQL
+│
+├── PostGIS
+│   ├── region, district boundaries
+│   ├── opportunity points
+│   ├── proximity
+│   ├── containment
+│   └── spatial filtering
+│
+├── Certificate service
+│   ├── unique certificate code
+│   ├── QR generation
+│   └── validation
+│
+└── GeoJSON API
+________________________________
+|       |       |       |       |
+| QTR 1 | QTR 2 | QRT 3 | QRT 4 |
+|_______|_______|_______|_______|
+
+
+
+##Dashboards
+
+Visit and review to make use of useful Dashboard template design format with light and dark mode toggible from the below template links:
+- https://demo.tailadmin.com/saas
+- https://demo.tailadmin.com/analytics
+- https://demo.tailadmin.com/marketing
+- https://demo.tailadmin.com/crm
+- https://demos.pixinvent.com/frest-html-admin-template/html/vertical-menu-template/tables-datatables-basic.html
+- https://demos.pixinvent.com/frest-html-admin-template/html/vertical-menu-template/tables-datatables-advanced.html
+- https://demos.pixinvent.com/frest-html-admin-template/html/vertical-menu-template/tables-datatables-extensions.html
+- https://demo.tailadmin.com/saas
+- https://demo.tailadmin.com/finance
+- https://demo.tailadmin.com/ai
+- https://demo.tailadmin.com/profile
+- https://demo.nextadmin.co/analytics
+- https://demos.pixinvent.com/frest-html-admin-template/html/vertical-menu-template/maps-leaflet.html
+- https://demo.nextadmin.co/saas
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/user/list
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/user/view/account
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/user/view/security
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/user/view/billing
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/user/view/notifications
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template-free/demo/
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/ecommerce/dashboard
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/logistics/dashboard
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/academy/dashboard
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/front-pages/payment
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/front-pages/landing#landingPricing
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/access-roles
+- https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo-1/app/access-permission
+- https://demos.pixinvent.com/vuexy-html-admin-template/html/vertical-menu-template/index.html
+- https://demos.pixinvent.com/vuexy-html-admin-template/html/vertical-menu-template/dashboards-crm.html
+- https://demos.pixinvent.com/vuexy-html-admin-template/html/vertical-menu-template/app-logistics-dashboard.html
+- https://demos.pixinvent.com/frest-html-admin-template/html/vertical-menu-template/
+- https://demos.pixinvent.com/frest-html-admin-template/html/vertical-menu-template/app-logistics-fleet.html
+- https://demos.pixinvent.com/frest-html-admin-template/html/vertical-menu-template/cards-advance.html
+
+

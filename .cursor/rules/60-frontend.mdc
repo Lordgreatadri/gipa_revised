@@ -1,0 +1,19 @@
+Blade
+    ↓
+Presentation
+
+Alpine
+    ↓
+Small interactive behavior
+
+Vanilla JS
+    ↓
+Reusable/browser-specific functionality
+
+Backend
+    ↓
+Business rules
+
+
+
+

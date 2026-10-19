@@ -1,0 +1,128 @@
+50-workflowsBK.mdc
+
+
+
+---
+description: IOMP workflow, state transition and SLA rules
+alwaysApply: true
+---
+
+# Workflow
+
+Workflows are business processes, not merely status fields.
+
+## Opportunity workflow
+
+
+## Confirmed workflows
+
+### Opportunity workflow
+
+The currently specified lifecycle is:
+
+draft
+→ pending approval
+→ approved
+→ active
+→ completed
+
+with cancellation as an applicable terminal path.
+
+Only opportunities that are both approved and active are eligible for
+authenticated investor opportunity access.
+
+### District workflow
+
+The currently specified lifecycle is:
+
+draft
+→ under review
+→ published
+
+with approval/rejection actions.
+
+### Investor onboarding workflow
+
+The confirmed investor onboarding process includes:
+
+registration
+→ email verification
+→ phone verification
+→ authenticated investor access
+
+Additional activation/approval states must not be invented unless confirmed.
+
+### Investor interaction workflows
+
+Authenticated and verified investors may initiate approved interactions
+against eligible active opportunities, including:
+
+- inquiry
+- expression of interest
+
+These interactions enter an internal management review process.
+
+The exact downstream states and transitions must follow confirmed client
+business rules.
+
+Do not invent downstream workflow states.
+
+## Workflow isolation
+
+Each bounded context owns its workflow semantics.
+
+Reusable workflow infrastructure may provide transition execution, authorization,
+audit, SLA and event mechanisms, but must not contain arbitrary business rules
+for every domain.
+
+## Investor opportunity eligibility
+
+Opportunity eligibility for investors is an authorization/business rule:
+
+Opportunity must be:
+
+- approved
+- active
+
+AND
+
+Investor must be:
+
+- authenticated
+- email verified
+- phone verified
+- authorized to access investor resources
+
+This rule must be enforced server-side.
+
+
+## Investor onboarding and engagement workflow
+
+Investor onboarding and authenticated investor opportunity access are confirmed
+business requirements.
+
+The baseline investor journey is:
+
+registered
+→ email verified
+→ phone verified
+→ investor access enabled
+
+After successful onboarding, an investor may access the investor dashboard and
+review opportunities that are currently eligible for investor visibility.
+
+Investor engagement is a separate workflow from opportunity lifecycle:
+
+eligible investor
+→ inquiry/interest submitted
+→ management review
+→ approve/reject/reassign
+→ continued engagement lifecycle
+
+Do not represent investor engagement using the opportunity's lifecycle status.
+
+An opportunity being approved/active does not mean that an investor engagement
+has been approved.
+
+Management review of investor engagement must be separately authorized and
+audited.

@@ -1,0 +1,194 @@
+---
+description: Core IOMP project engineering rules
+alwaysApply: true
+---
+
+# IOMP Project Rules
+
+## Project
+
+This repository contains the Investment Opportunities Mapping Project
+(IOMP) platform for the Ghana Investment Promotion Authority (GIPA).
+
+The system is a production-grade government platform.
+
+Priorities, in order:
+
+1. Security
+2. Correctness
+3. Data integrity
+4. Architectural integrity
+5. Maintainability
+6. Testability
+7. Performance
+8. Scalability
+9. Accessibility
+10. Developer productivity
+
+Do not sacrifice higher-priority concerns merely to implement a feature faster.
+
+## Technology Baseline
+
+The agreed implementation stack is:
+
+- Laravel 12
+- PHP
+- PostgreSQL
+- PostGIS
+- Blade
+- Alpine.js
+- Vanilla JavaScript where appropriate
+- Tailwind CSS
+- Vite
+- Docker
+- REST API
+- JWT authentication for the API
+- OpenAPI documentation
+
+Do not replace these technologies or introduce alternative application frameworks
+without an explicit architectural decision.
+
+The original TOR may contain implementation suggestions that have subsequently
+been superseded by client communication and architectural decisions.
+
+## Architecture
+
+The system uses a Domain-Driven Design inspired modular monolith.
+
+Business capabilities must have explicit boundaries.
+
+Do not introduce microservices unless an explicit architecture decision requires them.
+
+## Requirements
+
+The client requirements document is the source of business requirements.
+
+Never invent business rules.
+
+If a requirement is ambiguous, identify the ambiguity rather than silently
+inventing behavior.
+
+If an implementation decision conflicts with the documented requirements,
+record the conflict for review.
+
+## Government System
+
+Treat all potentially sensitive information as sensitive by default.
+
+Minimize data exposure.
+
+Do not expose internal implementation details through public APIs, logs,
+exceptions, or client-side code.
+
+## AI Behaviour
+
+Before implementing a significant feature:
+
+1. Understand the requirement.
+2. Identify the affected domain.
+3. Identify architectural impact.
+4. Identify security implications.
+5. Identify data implications.
+6. Identify required tests.
+7. Identify observability/audit requirements.
+8. Propose an implementation plan.
+9. Implement only after the plan is understood.
+
+Do not perform broad unrelated refactoring while implementing a feature.
+
+## Git
+
+Git operations are human-controlled.
+
+The AI must NOT:
+
+- create commits
+- amend commits
+- push commits
+- force push
+- create branches
+- delete branches
+- merge branches
+- rebase branches
+- reset commits
+- modify Git history
+
+The AI may inspect Git status and diffs when explicitly useful for development
+or review.
+
+The developer manually controls commits, branches, merges, and pushes.
+
+## Production Safety
+
+Never execute destructive production operations.
+
+Never modify production databases, credentials, infrastructure, or deployment
+configuration without explicit human authorization.
+
+Never request, expose, or generate production secrets.
+
+
+
+## Main Components
+1 Investor onboarding & aftercare platform 
+2 Certificates & anti-forgery verification (MVP) 
+3 Investor-to-business matchmaking
+4 External system integrations (ORC, GIS, payments)
+5 AI assistant (chatbot) 
+6 Internal automation & dashboards
+
+from the doc:
+# 8. Prototype Modules
+
+**A. Public Portal: **Landing page and explicitly public information; district information only where its publication policy allows; responsive/PWA shell. Protected opportunity list, detail, map points, and inquiry are not public. Verified investors reach those through the investor experience. Historical wording that put opportunity list/detail and investor inquiry on the anonymous portal is superseded by Client-INV-04 and Client-INV-05.
+
+**B. Authentication
+& Access: **Login, password reset, session controls, MFA-ready
+architecture, roles, groups, permissions and district-level restrictions.
+
+**C. Region &
+District Management: **261-district registry; region hierarchy; geometry;
+readiness score; economic data; population; area; import GeoJSON;
+draft/review/publish workflow.
+
+**D. Opportunity
+Management: **Structured opportunity form; location; sector/sub-sector;
+enterprise type; status; rationale; financials; contacts; documents; lifecycle
+workflow.
+
+**E. Workflow &
+SLA: **Draft → pending approval → approved → active → completed/cancelled;
+submit/approve/reject/reassign; SLA timers and breach alerts.
+
+**F. Geospatial &
+Investment Map: **PostGIS; GeoJSON; nearby/bounding-box/polygon queries;
+cascading filters; map markers and district boundaries.
+
+**G. Investor
+Inquiries: **Verified-investor inquiry and expression of interest on an approved and active opportunity; management review; tracking; email notifications. Not an anonymous public form. Downstream states remain the open engagement questions, not a reason to skip management review.
+
+**H. Dashboard &
+Reports: **Regional distribution; sector investment; opportunity timeline;
+readiness distribution; job creation; infrastructure quality.
+
+**I. Audit &
+Compliance: **Material admin/API action logging; actor, timestamp, IP, route,
+action, entity and before/after data where appropriate; retention/export.
+
+**J. Notifications: **Configurable
+email templates for submission, approval, rejection, inquiry and SLA breach.
+
+**K. Settings &
+Maintenance: **Workflow, notification, audit, onboarding and maintenance
+settings; admin/IP whitelist; graceful public maintenance page.
+
+**L. API: **Versioned
+REST resources; JWT requirement for API as stated in TOR; OpenAPI
+documentation; compatibility policy.
+
+**M. Onboarding &
+Messaging: **Admin onboarding tour, preferences and controlled user-to-user
+administrative messaging.
+
+**N. PWA: **Service
+worker, installability, offline fallback and health checks.

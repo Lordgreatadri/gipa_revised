@@ -1,0 +1,113 @@
+50-workflows.mdc
+
+---
+description: IOMP workflow, state transition and SLA rules
+alwaysApply: true
+---
+
+# Workflow
+
+Workflows are business processes, not merely status fields.
+
+## Opportunity workflow
+
+The currently specified lifecycle is:
+
+draft
+→ pending approval
+→ approved
+→ active
+→ completed
+
+with cancellation as an applicable terminal path.
+
+## District workflow
+
+The currently specified lifecycle is:
+
+draft
+→ under review
+→ published
+
+with approval/rejection actions.
+
+## State transitions
+
+Do not modify a workflow status directly from arbitrary application code.
+
+State transitions must be intentional and authorized.
+
+A transition should define:
+
+- source state
+- target state
+- actor
+- authorization requirement
+- timestamp
+- reason/comment where required
+- audit information
+- SLA implications
+
+## Rejection
+
+Do not invent rejection behavior.
+
+The destination of a rejected item must follow an approved business rule.
+
+## Reassignment
+
+Reassignment must:
+
+- verify authorization
+- preserve audit history
+- update the responsible party
+- correctly handle SLA implications
+
+## SLA
+
+SLA tracking must be based on explicit configurable rules.
+
+Do not hardcode SLA durations inside controllers.
+
+SLA calculations must consider:
+
+- start time
+- due time
+- business calendar if applicable
+- reassignment
+- pause/resume rules if applicable
+- completion
+- breach
+
+If these rules have not been confirmed, flag them as requirements needing clarification.
+
+## Notifications
+
+Workflow notifications should react to meaningful domain/application events.
+
+Do not tightly couple workflow logic to email or sms delivery.
+
+Email and sms delivery may be queued.
+
+## Audit
+
+Every material workflow transition must produce an audit record.
+
+That is stronger than:
+
+AuditLog::create(...)
+
+We need to consider:
+
+Actor
+Action
+Resource
+Resource ID
+Before
+After
+IP
+User Agent
+Request ID
+Timestamp
+Authentication context
+Source/API/UI

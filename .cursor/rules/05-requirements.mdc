@@ -1,0 +1,216 @@
+---
+description: IOMP requirements interpretation and traceability
+alwaysApply: true
+---
+
+# Requirements Interpretation
+
+The project requirements document is authoritative for business behavior.
+
+## Requirement precedence
+
+When requirements conflict, use this precedence:
+
+1. Explicit current client decision
+2. Updated client requirements via user request inputs
+3. Approved architecture decision record
+4. Current approved functional requirements
+5. Original TOR implementation wording
+6. AI assumptions
+
+Never allow an AI assumption to override an explicit client decision.
+
+## Superseded Technical References
+
+The original TOR contains technical references that may no longer represent
+the agreed implementation.
+
+Examples include implementation-specific framework references.
+
+Do not infer the technology stack from those references.
+
+The current project technology baseline is defined by the project rules.
+
+
+
+## Main Components
+1 Investor onboarding & aftercare platform 
+2 Certificates & anti-forgery verification (MVP) 
+3 Investor-to-business matchmaking
+4 External system integrations (ORC, GIS, payments)
+5 AI assistant (chatbot) 
+6 Internal automation & dashboards
+
+from the doc:
+# 8. Prototype Modules
+
+**A. Public Portal: **Landing page and explicitly public information; district information only where its publication policy allows; responsive/PWA shell. Protected opportunity list, detail, map points, and inquiry are not public. Verified investors reach those through the investor experience. Historical wording that put opportunity list/detail and investor inquiry on the anonymous portal is superseded by Client-INV-04 and Client-INV-05.
+
+**B. Authentication
+& Access: **Login, password reset, session controls, MFA-ready
+architecture, roles, groups, permissions and district-level restrictions.
+
+**C. Region &
+District Management: **261-district registry; region hierarchy; geometry;
+readiness score; economic data; population; area; import GeoJSON;
+draft/review/publish workflow.
+
+**D. Opportunity
+Management: **Structured opportunity form; location; sector/sub-sector;
+enterprise type; status; rationale; financials; contacts; documents; lifecycle
+workflow.
+
+**E. Workflow &
+SLA: **Draft → pending approval → approved → active → completed/cancelled;
+submit/approve/reject/reassign; SLA timers and breach alerts.
+
+**F. Geospatial &
+Investment Map: **PostGIS; GeoJSON; nearby/bounding-box/polygon queries;
+cascading filters; map markers and district boundaries.
+
+**G. Investor
+Inquiries: **Verified-investor inquiry and expression of interest on an approved and active opportunity; management review; tracking; email notifications. Not an anonymous public form. Downstream states remain the open engagement questions, not a reason to skip management review.
+
+**H. Dashboard &
+Reports: **Regional distribution; sector investment; opportunity timeline;
+readiness distribution; job creation; infrastructure quality.
+
+**I. Audit &
+Compliance: **Material admin/API action logging; actor, timestamp, IP, route,
+action, entity and before/after data where appropriate; retention/export.
+
+**J. Notifications: **Configurable
+email templates for submission, approval, rejection, inquiry and SLA breach.
+
+**K. Settings &
+Maintenance: **Workflow, notification, audit, onboarding and maintenance
+settings; admin/IP whitelist; graceful public maintenance page.
+
+**L. API: **Versioned
+REST resources; JWT requirement for API as stated in TOR; OpenAPI
+documentation; compatibility policy.
+
+**M. Onboarding &
+Messaging: **Admin onboarding tour, preferences and controlled user-to-user
+administrative messaging.
+
+**N. PWA: **Service
+worker, installability, offline fallback and health checks.
+
+## Ambiguity
+
+When a requirement is incomplete:
+
+- do not invent business policy;
+- identify the missing decision;
+- document the assumption if implementation must temporarily proceed;
+- keep the implementation replaceable where practical.
+
+## Requirement Traceability
+
+Major features should be traceable to one or more requirements.
+
+Use identifiers such as:
+
+FR-01
+FR-02
+FR-03
+
+and
+
+NFR-01
+NFR-02
+NFR-03
+
+when discussing requirements.
+
+Implementation plans should reference the relevant requirement identifiers.
+
+## No Silent Requirement Changes
+
+Do not change the meaning of a requirement simply to make implementation easier.
+
+If implementation reveals a contradiction or infeasible requirement,
+surface it explicitly.
+
+
+
+## Confirmed Client Decisions Beyond the Original TOR
+
+The original TOR is not the sole source of current business behavior.
+
+Current explicit client decisions supersede conflicting or less-specific TOR
+wording.
+
+A confirmed client decision currently establishes that:
+
+- investors must register;
+- investors must verify email;
+- investors must verify phone;
+- verified investors receive authenticated investor dashboard access;
+- only approved and active opportunities are available to investors;
+- investors may review eligible opportunities;
+- investors may make inquiries and/or express interest;
+- authorized management personnel review investor interactions;
+- management actions are permission-controlled;
+- subsequent workflow behavior must follow confirmed business rules.
+
+These requirements are authoritative even where the original TOR describes
+opportunities as publicly discoverable.
+
+Do not revert to public unrestricted opportunity access because of older TOR
+wording.
+
+Do not invent the downstream investor interaction workflow where the client
+has not yet specified it.
+
+
+## Confirmed Client Decisions
+
+The following are confirmed requirements even where the original TOR does not
+describe them with sufficient detail:
+
+### Investor registration and protected opportunity access
+
+The platform shall provide investor registration and onboarding.
+
+An investor must successfully verify their required contact channels,
+including email and phone, before receiving the applicable authenticated
+investor access.
+
+Authenticated and successfully onboarded investors shall have access to their
+investor dashboard.
+
+Eligible approved/active investment opportunities shall be made available to
+eligible authenticated investors through the investor experience.
+
+Investors may review eligible opportunities and initiate an inquiry and/or
+expression of interest.
+
+Management personnel with the appropriate role and permission shall review
+resulting investor engagements and continue the applicable approval/review
+workflow.
+
+This requirement takes precedence over any earlier discovery interpretation
+that treated authenticated investor access or investor onboarding as
+unconfirmed or out of scope.
+
+### Requirement evolution
+
+The original TOR is not assumed to contain every current production/client
+decision.
+
+Where an explicit current client decision supplied through project
+requirements supersedes or expands the TOR, the current client decision takes
+precedence.
+
+Such changes must be reflected in:
+
+- requirements documentation;
+- traceability;
+- relevant ADRs;
+- implementation plans;
+- automated tests.
+
+Do not silently discard an original TOR requirement. Where the newer client
+decision changes its meaning, record the relationship explicitly.

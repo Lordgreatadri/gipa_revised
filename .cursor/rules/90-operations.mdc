@@ -1,0 +1,95 @@
+90-operations.mdc
+---
+description: IOMP deployment, observability, backup and operational rules
+alwaysApply: true
+---
+
+# Operations
+
+The application must be deployable through documented, repeatable processes.
+
+## Docker
+
+Production and staging deployment must use documented containerized artifacts.
+
+Containers must be reproducible.
+
+Do not put secrets into Docker images.
+
+## Configuration
+
+Configuration must be environment-specific.
+
+Never hardcode environment credentials.
+
+## Environments
+
+Keep clear separation between:
+
+- local development
+- testing
+- staging
+- production
+
+Never use production credentials locally.
+
+## Logging
+
+Logs must be:
+
+- structured where practical
+- useful for diagnosis
+- free from secrets
+- appropriately retained
+
+## Monitoring
+
+Monitor important system health indicators including:
+
+- application errors
+- request latency
+- queue health
+- database health
+- storage
+- infrastructure health
+- authentication failures
+- important security events
+
+## Health
+
+Health endpoints must not disclose sensitive information.
+
+## Backups
+
+Define:
+
+- backup frequency
+- retention
+- encryption
+- restoration procedures
+- restore testing
+
+A backup that has never been restored/tested should not be assumed reliable.
+
+## Disaster Recovery
+
+Document:
+
+- recovery objectives
+- restoration procedure
+- dependencies
+- recovery order
+
+## Maintenance Mode
+
+Maintenance mode must fail safely.
+
+Administrative access and whitelisted access must be explicitly authorized.
+
+API responses during maintenance must follow the approved contract.
+
+## Production Changes
+
+Do not make destructive production changes autonomously.
+
+Human approval is required for production deployment and database changes.

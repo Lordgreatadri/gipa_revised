@@ -1,0 +1,122 @@
+---
+description: IOMP system architecture and dependency rules
+alwaysApply: true
+---
+
+# Architecture
+
+IOMP is a modular monolith.
+
+The architecture must preserve strong internal boundaries while allowing
+the system to be deployed as a single application.
+
+## Architectural layers
+
+Use these conceptual layers:
+
+Presentation
+    ↓
+Application
+    ↓
+Domain
+
+Infrastructure supports the application and domain through explicit boundaries.
+
+## Presentation
+
+Presentation includes:
+
+- HTTP controllers
+- API controllers
+- Form requests
+- Blade views
+- UI components
+- middleware
+- serializers/resources
+
+Presentation code should orchestrate requests and responses.
+
+Business rules should not accumulate inside controllers or Blade templates.
+
+## Application
+
+Application services represent use cases.
+
+They coordinate:
+
+- domain behavior
+- transactions
+- repositories where justified
+- external services
+- domain events
+- authorization decisions where appropriate
+
+Application services should not become generic "god services."
+
+## Domain
+
+The domain contains business concepts and rules.
+
+Avoid direct dependency on:
+
+- HTTP
+- Blade
+- JavaScript
+- controllers
+- request objects
+- infrastructure implementations
+
+Framework integration should remain at appropriate boundaries.
+
+## Infrastructure
+
+Infrastructure contains technical implementations such as:
+
+- persistence
+- external API clients
+- mail providers
+- sms providers
+- file storage
+- geospatial persistence
+- queue infrastructure
+- authentication adapters
+
+## Bounded Contexts
+
+Do not allow one bounded context to directly manipulate another bounded context's
+internal state.
+
+Cross-context communication must use explicit contracts.
+
+Possible mechanisms include:
+
+- application services
+- domain events
+- integration events
+- queries
+- read models
+
+Choose the simplest appropriate mechanism.
+
+## No Premature Microservices
+
+Do not split the application into microservices unless there is a documented
+architectural reason.
+
+Prefer a modular monolith until independent deployment or scaling is genuinely
+required.
+
+## Architectural Changes
+
+Changes that affect:
+
+- bounded contexts
+- dependency direction
+- persistence strategy
+- authentication architecture
+- authorization architecture
+- API compatibility
+- deployment architecture
+- security boundaries
+
+should be treated as architectural decisions and documented.

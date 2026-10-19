@@ -1,0 +1,206 @@
+---
+description: IOMP Domain-Driven Design rules
+alwaysApply: true
+---
+
+# Domain-Driven Design
+
+Use DDD principles pragmatically.
+
+Do not introduce DDD patterns merely for ceremony.
+
+## Domain concepts
+
+Prefer explicit domain concepts over generic abstractions.
+
+Examples:
+
+- Opportunity
+- District
+- Region
+- Inquiry
+- Workflow
+- SLA
+- Investment Structure
+- Sector
+
+
+##Main Components
+1 Investor onboarding & aftercare platform 
+2 Certificates & anti-forgery verification (MVP) 
+3 Investor-to-business matchmaking
+4 External system integrations (ORC, GIS, payments)
+5 AI assistant (chatbot) 
+6 Internal automation & dashboards
+
+from the doc:
+# 8. Prototype Modules
+
+**A. Public Portal: **Landing page and explicitly public information; district information only where its publication policy allows; responsive/PWA shell. Protected opportunity list, detail, map points, and inquiry are not public. Verified investors reach those through the investor experience. Historical wording that put opportunity list/detail and investor inquiry on the anonymous portal is superseded by Client-INV-04 and Client-INV-05.
+
+**B. Authentication
+& Access: **Login, password reset, session controls, MFA-ready
+architecture, roles, groups, permissions and district-level restrictions.
+
+**C. Region &
+District Management: **261-district registry; region hierarchy; geometry;
+readiness score; economic data; population; area; import GeoJSON;
+draft/review/publish workflow.
+
+**D. Opportunity
+Management: **Structured opportunity form; location; sector/sub-sector;
+enterprise type; status; rationale; financials; contacts; documents; lifecycle
+workflow.
+
+**E. Workflow &
+SLA: **Draft → pending approval → approved → active → completed/cancelled;
+submit/approve/reject/reassign; SLA timers and breach alerts.
+
+**F. Geospatial &
+Investment Map: **PostGIS; GeoJSON; nearby/bounding-box/polygon queries;
+cascading filters; map markers and district boundaries.
+
+**G. Investor
+Inquiries: **Verified-investor inquiry and expression of interest on an approved and active opportunity; management review; tracking; email notifications. Not an anonymous public form. Downstream states remain the open engagement questions, not a reason to skip management review.
+
+**H. Dashboard &
+Reports: **Regional distribution; sector investment; opportunity timeline;
+readiness distribution; job creation; infrastructure quality.
+
+**I. Audit &
+Compliance: **Material admin/API action logging; actor, timestamp, IP, route,
+action, entity and before/after data where appropriate; retention/export.
+
+**J. Notifications: **Configurable
+email templates for submission, approval, rejection, inquiry and SLA breach.
+
+**K. Settings &
+Maintenance: **Workflow, notification, audit, onboarding and maintenance
+settings; admin/IP whitelist; graceful public maintenance page.
+
+**L. API: **Versioned
+REST resources; JWT requirement for API as stated in TOR; OpenAPI
+documentation; compatibility policy.
+
+**M. Onboarding &
+Messaging: **Admin onboarding tour, preferences and controlled user-to-user
+administrative messaging.
+
+**N. PWA: **Service
+worker, installability, offline fallback and health checks.
+
+
+Use terminology from the client's business domain.
+
+## Aggregates
+
+Use aggregates where consistency boundaries require them.
+
+Do not create an aggregate for every database table.
+
+An aggregate should protect meaningful business invariants.
+
+## Entities
+
+Entities have identity and lifecycle.
+
+Do not make every database model a domain entity automatically.
+
+## Value Objects
+
+Use value objects where a concept has meaningful validation or behavior.
+
+Potential examples include:
+
+- Money
+- InvestmentAmount
+- GeographicCoordinate
+- EmailAddress
+- PhoneNumber
+- Percentage
+- InvestmentMetric
+
+Do not create trivial wrappers without a clear benefit.
+
+## Domain Services
+
+Use domain services when important domain behavior does not naturally belong
+to a single entity or value object.
+
+Do not use domain services as generic utility classes.
+
+## Domain Events
+
+Use domain events when something meaningful happened in the domain and other
+parts of the system need to react.
+
+Examples may include:
+
+- OpportunitySubmitted
+- OpportunityApproved
+- OpportunityRejected
+- OpportunityPublished
+- InquirySubmitted
+- SlaBreached
+
+Do not create events for every method call.
+
+## Cross-context boundaries
+
+Never reach into another domain module's internal entities or repositories.
+
+Expose intentional application contracts.
+
+## Business Rules
+
+Business rules must be explicit and testable.
+
+Do not hide important business rules inside:
+
+- Blade
+- JavaScript
+- SQL
+- controller conditionals
+- Eloquent accessors
+- random helper functions
+
+
+
+## Investor domain concepts
+
+The investor capability includes explicit business concepts such as:
+
+- Investor
+- InvestorProfile
+- InvestorVerification
+- InvestorInquiry
+- InvestorInterest
+- InvestorInteraction
+- ManagementAssignment
+
+These are domain concepts, not necessarily direct database-table requirements.
+
+Investor Inquiry and Investor Interest must not automatically be represented
+as boolean attributes of Opportunity.
+
+The relationship between Investor and Opportunity is a business interaction
+boundary and should be modeled explicitly.
+
+## Investor access invariant
+
+A protected investor opportunity use case must enforce:
+
+Investor is authenticated
+AND
+email is verified
+AND
+phone is verified
+AND
+opportunity is approved
+AND
+opportunity is active
+
+before protected opportunity access is granted.
+
+This is an application/domain authorization invariant and must not exist only
+in Blade or JavaScript.

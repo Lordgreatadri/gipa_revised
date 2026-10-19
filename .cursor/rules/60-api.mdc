@@ -1,0 +1,116 @@
+60-api.mdc
+
+---
+description: IOMP REST API architecture and compatibility rules
+alwaysApply: true
+---
+
+# REST API
+
+The API is a public integration boundary.
+
+Treat it as a long-lived contract.
+
+## Versioning
+
+Use explicit API versioning.
+
+Current baseline:
+
+/api/v1/
+
+Do not introduce breaking changes into an existing API version.
+
+## Backward compatibility
+
+Changes to an existing API version must preserve existing clients unless
+an explicitly approved compatibility exception exists.
+
+Breaking changes require a new API version according to the project's
+versioning policy.
+
+## API responses
+
+Use consistent response structures.
+
+Do not expose internal database structures merely because they exist.
+
+API resources should represent deliberate contracts.
+
+## Validation
+
+Validate all incoming API data.
+
+Never trust client-side validation.
+
+## Authorization
+
+Every protected endpoint must enforce authorization.
+
+Do not rely on authentication alone.
+
+## Pagination
+
+Collection endpoints should use bounded pagination.
+
+Never return an unbounded large dataset by default.
+
+## Filtering
+
+Filtering must use explicit allowlisted fields.
+
+Never convert arbitrary client input directly into SQL expressions.
+
+## Sorting
+
+Sorting fields must be allowlisted.
+
+## Geospatial endpoints
+
+Geospatial queries must enforce:
+
+- bounded result sizes
+- validated coordinates
+- validated geometry
+- appropriate indexes
+- authorization where applicable
+
+## Errors
+
+API errors should be stable, documented, useful, and safe.
+
+Do not expose internal exceptions or SQL details.
+
+## OpenAPI
+
+API changes should keep OpenAPI documentation synchronized.
+
+The OpenAPI specification is part of the API contract.
+
+## JWT
+
+JWT implementation must use an established maintained library and approved
+security configuration.
+
+Do not implement cryptographic token handling manually.
+
+
+## Investor API boundary
+
+Investor-facing API resources must distinguish between:
+
+- public resources
+- authenticated investor resources
+- internal management resources
+
+Protected investor resources require the approved authentication mechanism
+and appropriate investor verification/authorization.
+
+An authenticated investor must not automatically receive internal management
+fields.
+
+Opportunity serializers/resources must expose only fields appropriate to the
+requesting actor.
+
+Do not expose internal workflow metadata, audit information, assignments,
+internal notes, or sensitive contact information unless explicitly authorized.

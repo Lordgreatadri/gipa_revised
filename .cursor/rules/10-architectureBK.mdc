@@ -1,0 +1,70 @@
+---
+description: Architectural boundaries and design rules
+alwaysApply: true
+---
+
+# Architecture
+
+The application uses Domain-Driven Design with explicit bounded contexts.
+
+Each bounded context owns its domain behavior.
+
+Dependency direction must be intentional.
+
+Prefer:
+
+Presentation
+    ↓
+Application
+    ↓
+Domain
+
+Infrastructure implements technical concerns required by the application/domain.
+
+Domain code must not depend directly on:
+
+- HTTP
+- Blade
+- JavaScript
+- controllers
+- framework-specific request objects
+- infrastructure implementations
+- external API clients
+
+Infrastructure may depend on the domain/application contracts where required.
+
+## Cross-context communication
+
+Do not directly access another bounded context's internal domain objects.
+
+Use explicit contracts such as:
+
+- application services
+- commands
+- queries
+- domain events
+- integration events
+
+depending on the use case.
+
+Do not create distributed-system complexity where a modular monolith is sufficient.
+
+## Laravel
+
+Laravel is the application framework, not the architecture.
+
+Use Laravel conventions where they improve clarity.
+
+Do not force business logic into:
+
+- controllers
+- Eloquent models
+- Blade templates
+- middleware
+- form requests
+
+when that logic belongs in the domain/application layer.
+
+Controllers should remain thin.
+
+Blade templates should remain presentation-focused.

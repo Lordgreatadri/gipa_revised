@@ -1,0 +1,100 @@
+80-testing.mdc
+
+---
+description: IOMP automated testing strategy
+alwaysApply: true
+---
+
+# Testing
+
+Tests are part of the implementation, not an afterthought.
+
+## Test categories
+
+Use appropriate combinations of:
+
+- unit tests
+- feature tests
+- integration tests
+- API tests
+- database tests
+- authorization tests
+- workflow tests
+- browser/end-to-end tests where justified
+
+## Domain tests
+
+Domain rules should be testable independently where practical.
+
+Focus on behavior and invariants.
+
+## Authorization tests
+
+Every sensitive capability should have tests for:
+
+- authorized access
+- unauthorized access
+- wrong role
+- wrong district scope
+- unauthenticated access
+
+## Workflow tests
+
+Test:
+
+- valid transitions
+- invalid transitions
+- unauthorized transitions
+- rejection behavior
+- reassignment
+- SLA behavior
+- audit creation
+- notifications
+- callback payload validation
+- callback signature validation
+
+## API tests
+
+Test:
+
+- authentication
+- authorization
+- validation
+- response contract
+- pagination
+- filtering
+- errors
+- versioning
+
+## Security tests
+
+Test important security boundaries.
+
+Do not test only happy paths.
+
+## Database tests
+
+Verify important:
+
+- constraints
+- relationships
+- uniqueness
+- spatial behavior
+- transactional behavior
+
+## Regression
+
+Every production bug should result in a regression test when practical.
+
+## Test quality
+
+Do not weaken or delete tests merely to make implementation pass.
+
+If a test appears incorrect, identify why before changing it.
+
+## Coverage
+
+Coverage targets are project requirements, but coverage percentage alone does
+not demonstrate correctness.
+
+Prefer meaningful behavioral coverage.
