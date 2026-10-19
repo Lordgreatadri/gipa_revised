@@ -4,6 +4,7 @@ use App\Modules\Assistant\Presentation\Http\Controllers\AssistantKnowledgeContro
 use App\Modules\Backup\Presentation\Http\Controllers\BackupController;
 use App\Modules\Identity\Domain\Access\AccessPermissions;
 use App\Modules\Identity\Presentation\Http\Controllers\AdminDashboardController;
+use App\Modules\Identity\Presentation\Http\Controllers\LoginHistoryController;
 use App\Modules\Identity\Presentation\Http\Controllers\ReportingController;
 use App\Modules\InvestorEngagement\Presentation\Http\Controllers\EngagementReviewController;
 use App\Modules\Geography\Presentation\Http\Controllers\GeographyController;
@@ -144,6 +145,9 @@ Route::prefix('admin')->middleware(['auth', 'staff', 'can:'.AccessPermissions::A
         Route::middleware('can:'.AccessPermissions::AUDIT_VIEW)->group(function (): void {
             Route::get('/audit', [AuditLogController::class, 'index'])->name('audit');
             Route::get('/audit/export', [AuditLogController::class, 'export'])->name('audit.export');
+        });
+        Route::middleware('can:'.AccessPermissions::LOGINS_VIEW)->group(function (): void {
+            Route::get('/logins', [LoginHistoryController::class, 'index'])->name('logins.index');
         });
         Route::middleware('can:'.AccessPermissions::SMS_MESSAGES_VIEW)->group(function (): void {
             Route::get('/sms/messages', [SmsMessageController::class, 'index'])->name('sms.messages');

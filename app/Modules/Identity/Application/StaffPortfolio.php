@@ -5,6 +5,7 @@ namespace App\Modules\Identity\Application;
 use App\Modules\Audit\Infrastructure\Persistence\AuditRecord;
 use App\Modules\Identity\Domain\Access\AccessPermissions;
 use App\Modules\Identity\Domain\Enums\UserType;
+use App\Modules\Identity\Domain\Models\LoginAttempt;
 use App\Modules\Identity\Domain\Models\Permission;
 use App\Modules\Identity\Domain\Models\Role;
 use App\Modules\Identity\Domain\Models\User;
@@ -60,6 +61,9 @@ final class StaffPortfolio
             'activity' => $opportunities === null ? collect() : $this->activity($user),
             'audit' => $user->can(AccessPermissions::AUDIT_VIEW)
                 ? AuditRecord::query()->with('causer:id,name')->latest('id')->limit(6)->get()
+                : null,
+            'logins' => $user->can(AccessPermissions::LOGINS_VIEW)
+                ? LoginAttempt::query()->latest('id')->limit(6)->get()
                 : null,
             'lifecycle' => $opportunities === null ? [] : collect(WorkflowState::cases())->map(fn (WorkflowState $state): array => [
                 'label' => $state->label(),

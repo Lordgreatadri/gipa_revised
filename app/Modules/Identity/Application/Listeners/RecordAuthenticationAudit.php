@@ -4,7 +4,10 @@ namespace App\Modules\Identity\Application\Listeners;
 
 use App\Modules\Audit\Application\AuditEntry;
 use App\Modules\Audit\Application\Contracts\AuditRecorder;
+use App\Modules\Identity\Application\LoginHistory\RecordLoginAttempt;
 use App\Modules\Identity\Domain\IdentityAuditActions;
+use App\Modules\Identity\Domain\Models\LoginAttempt;
+use App\Modules\Identity\Domain\Models\User;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
@@ -21,7 +24,10 @@ use Illuminate\Events\Dispatcher;
  */
 class RecordAuthenticationAudit
 {
-    public function __construct(private readonly AuditRecorder $audit) {}
+    public function __construct(
+        private readonly AuditRecorder $audit,
+        private readonly RecordLoginAttempt $attempts,
+    ) {}
 
     public function subscribe(Dispatcher $events): void
     {
@@ -52,29 +58,49 @@ class RecordAuthenticationAudit
                 ->causedBy($user)
                 ->withMetadata(['guard' => $event->guard, 'remember' => $event->remember])
         );
+
+        $account = $user instanceof User ? $user : null;
+        $this->attempts->record(LoginAttempt::OUTCOME_SUCCESS, $account, $account?->email, $event->guard, $event->remember);
     }
 
     public function onFailed(Failed $event): void
     {
         $user = $event->user;
 
+        $identifier = $this->identifier($event->credentials);
+
         $this->audit->record(
             AuditEntry::for(IdentityAuditActions::LOGIN_FAILED, $user instanceof Model ? $user : null)
                 ->causedBy(null)
                 ->withMetadata([
                     'guard' => $event->guard,
-                    'identifier' => $this->identifier($event->credentials),
+                    'identifier' => $identifier,
                 ])
+        );
+
+        $this->attempts->record(
+            LoginAttempt::OUTCOME_FAILED,
+            $user instanceof User ? $user : null,
+            $identifier,
+            $event->guard,
         );
     }
 
     public function onLockout(Lockout $event): void
     {
+        $identifier = $this->identifier($event->request->only('email'));
+
         $this->audit->record(
             AuditEntry::for(IdentityAuditActions::LOGIN_LOCKED_OUT)
                 ->causedBy(null)
-                ->withMetadata(['identifier' => $this->identifier($event->request->only('email'))])
+                ->withMetadata(['identifier' => $identifier])
         );
+
+        $account = $identifier === null
+            ? null
+            : User::query()->whereRaw('lower(email) = ?', [$identifier])->first();
+
+        $this->attempts->record(LoginAttempt::OUTCOME_LOCKED, $account, $identifier, 'web');
     }
 
     public function onLogout(Logout $event): void

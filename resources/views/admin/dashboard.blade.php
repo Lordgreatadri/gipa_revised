@@ -157,4 +157,37 @@
             @endif
         </section>
     </div>
+
+    @if ($portfolio['logins'] !== null)
+        <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-card dark:border-slate-800 dark:bg-slate-900">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2"><i data-lucide="log-in" class="size-4 text-brand-700 dark:text-brand-300"></i><h2 class="text-sm font-bold text-slate-900 dark:text-white">{{ __('Login history') }}</h2></div>
+                <a class="text-xs font-semibold text-brand-800 underline dark:text-brand-200" href="{{ route('admin.logins.index') }}">{{ __('Open') }}</a>
+            </div>
+            <div class="mt-4 overflow-x-auto">
+                <table class="data-table min-w-full text-left">
+                    <thead>
+                        <tr>
+                            <th>{{ __('When') }}</th>
+                            <th>{{ __('Account') }}</th>
+                            <th>{{ __('Result') }}</th>
+                            <th>{{ __('Location') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($portfolio['logins'] as $attempt)
+                            <tr>
+                                <td>{{ $attempt->created_at?->timezone(config('app.timezone'))->format('d M Y H:i') }}</td>
+                                <td class="font-semibold text-slate-900 dark:text-white">{{ $attempt->email }}</td>
+                                <td>{{ $attempt->outcomeLabel() }}</td>
+                                <td>{{ $attempt->placeLabel() !== '' ? $attempt->placeLabel() : ($attempt->ip_address ?: __('Not available')) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="text-slate-500">{{ __('No sign-in attempts are recorded yet.') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @endif
 </x-layouts.workspace>
