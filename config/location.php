@@ -9,6 +9,7 @@ return [
      * GeoLite2 database is available.
      */
     'driver' => Stevebauman\Location\Drivers\IpApi::class,
+    #'driver' => Stevebauman\Location\Drivers\MaxMind::class,     
 
     'fallbacks' => [],
 
