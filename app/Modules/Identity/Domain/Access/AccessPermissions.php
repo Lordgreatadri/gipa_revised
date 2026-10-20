@@ -57,6 +57,8 @@ final class AccessPermissions
 
     public const AUDIT_VIEW = 'audit.view';
 
+    public const LOGINS_VIEW = 'security.logins.view';
+
     public const SMS_MANAGE = 'sms.manage';
 
     public const SMS_MESSAGES_VIEW = 'sms.messages.view';
@@ -106,6 +108,7 @@ final class AccessPermissions
         self::CONTACT_VIEW,
         self::CONTACT_MANAGE,
         self::AUDIT_VIEW,
+        self::LOGINS_VIEW,
         self::SMS_MANAGE,
         self::SMS_MESSAGES_VIEW,
         self::SMS_CAMPAIGNS_MANAGE,
@@ -159,6 +162,7 @@ final class AccessPermissions
             ],
             'Audit' => [
                 self::AUDIT_VIEW,
+                self::LOGINS_VIEW,
             ],
             'Messaging' => [
                 self::SMS_MANAGE,

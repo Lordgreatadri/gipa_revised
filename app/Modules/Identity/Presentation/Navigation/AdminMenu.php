@@ -47,6 +47,7 @@ final class AdminMenu
                 'label' => 'Assurance',
                 'items' => [
                     $this->item('Audit log', 'admin.audit', 'scroll-text', 'admin.audit*', AccessPermissions::AUDIT_VIEW),
+                    $this->item('Login history', 'admin.logins.index', 'log-in', 'admin.logins.*', AccessPermissions::LOGINS_VIEW),
                     $this->item('SMS gateways', 'admin.sms.index', 'smartphone', ['admin.sms.index', 'admin.sms.edit'], AccessPermissions::SMS_MANAGE),
                     $this->item('SMS messages', 'admin.sms.messages', 'list', 'admin.sms.messages*', AccessPermissions::SMS_MESSAGES_VIEW),
                     $this->item('Bulk SMS', 'admin.sms.campaigns', 'send', 'admin.sms.campaigns*', AccessPermissions::SMS_CAMPAIGNS_MANAGE),
